@@ -1,0 +1,31 @@
+{
+    "name": "yii2tech/ar-file",
+    "description": "Provides support for ActiveRecord file attachment",
+    "keywords": ["yii2", "active", "record", "file", "attachment"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yii2tech/ar-file/issues",
+        "forum": "http://www.yiiframework.com/forum/",
+        "wiki": "https://github.com/yii2tech/ar-file/wiki",
+        "source": "https://github.com/yii2tech/ar-file"
+    },
+    "authors": [
+        {
+            "name": "Paul Klimov",
+            "email": "klimov.paul@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "yii2tech/file-storage": "1.0.x-dev"
+    },
+    "autoload": {
+        "psr-4": { "yii2tech\\ar\\file\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
