@@ -28,6 +28,7 @@ install:
   - travis_retry composer global require "fxp/composer-asset-plugin:~1.1.1"
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - travis_retry composer install --prefer-dist --no-interaction
+  - travis_retry composer require --prefer-dist yiisoft/yii2-imagine
 
 script:
   - phpunit --verbose $PHPUNIT_FLAGS

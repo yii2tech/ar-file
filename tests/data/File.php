@@ -5,6 +5,12 @@ namespace yii2tech\tests\unit\ar\file\data;
 use yii\db\ActiveRecord;
 use yii2tech\ar\file\FileBehavior;
 
+/**
+ * @property integer $id
+ * @property string $name
+ * @property string $fileExtension
+ * @property string $fileVersion
+ */
 class File extends ActiveRecord
 {
     /**
