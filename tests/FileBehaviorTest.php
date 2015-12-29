@@ -275,8 +275,7 @@ class FileBehaviorTest extends TestCase
         $model = File::findOne(1);
 
         // Single string:
-        $emptyDefaultFileWebSrc = '';
-        $model->defaultFileUrl = $emptyDefaultFileWebSrc;
+        $model->defaultFileUrl = null;
         $returnedFileWebSrc = $model->getFileUrl();
         $this->assertTrue(!empty($returnedFileWebSrc), 'Unable to get file web src with empty default one!');
 

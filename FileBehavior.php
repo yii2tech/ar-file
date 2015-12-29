@@ -93,10 +93,9 @@ class FileBehavior extends Behavior
     public $fileTabularInputIndex = null;
     /**
      * @var string URL which is used to set up web links, which will be returned, if requested file does not exists.
-     * For example:
-     * 'http://www.myproject.com/materials/default/image.jpg'
+     * For example: 'http://www.myproject.com/materials/default/image.jpg'
      */
-    public $defaultFileUrl = '';
+    public $defaultFileUrl;
     /**
      * @var boolean indicates if behavior will attempt to fetch uploaded file automatically
      * from the HTTP request.
@@ -456,10 +455,9 @@ class FileBehavior extends Behavior
     {
         $fileStorageBucket = $this->getFileStorageBucket();
         $fileFullName = $this->getFileFullName();
-        $defaultFileUrl = $this->defaultFileUrl;
-        if (!empty($defaultFileUrl)) {
+        if ($this->defaultFileUrl !== null) {
             if (!$fileStorageBucket->fileExists($fileFullName)) {
-                return $defaultFileUrl;
+                return $this->defaultFileUrl;
             }
         }
         return $fileStorageBucket->getFileUrl($fileFullName);
