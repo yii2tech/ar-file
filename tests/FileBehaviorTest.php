@@ -18,7 +18,7 @@ class FileBehaviorTest extends TestCase
         $model = new File();
         $model->fileStorageBucket = $testBucketName;
 
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
 
         $this->assertTrue(is_object($fileStorageBucket), 'Unable to get file storage bucket!');
         $this->assertEquals($testBucketName, $fileStorageBucket->getName(), 'Returned file storage bucket has incorrect name!');
@@ -34,7 +34,7 @@ class FileBehaviorTest extends TestCase
 
         $model->fileStorageBucket = null;
 
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
 
         $this->assertNotEmpty($fileStorageBucket->getName(), 'Unable to get default file storage bucket name!');
     }
@@ -52,7 +52,7 @@ class FileBehaviorTest extends TestCase
         $model = new File();
         $model->fileStorageBucket = $testBucketName;
 
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
 
         $this->assertTrue(is_object($fileStorageBucket), 'Unable to get file storage bucket!');
         $this->assertEquals($testBucketName, $fileStorageBucket->getName(), 'Returned file storage bucket has incorrect name!');
@@ -108,7 +108,7 @@ class FileBehaviorTest extends TestCase
         $this->assertTrue($model->saveFile($testFileName), 'Unable to save file!');
 
         $returnedFileFullName = $model->getFileFullName();
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
 
         $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), 'Unable to save file in the file storage bucket!');
 
@@ -199,7 +199,7 @@ class FileBehaviorTest extends TestCase
 
         $this->assertTrue($model->save(), 'Unable to save record with file!');
 
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
         $returnedFileFullName = $model->getFileFullName();
 
         $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), 'Unable to save file in the file storage bucket!');
@@ -220,7 +220,7 @@ class FileBehaviorTest extends TestCase
 
         $this->assertTrue($model->save(), 'Unable to save record with file fetched from Web!');
 
-        $fileStorageBucket = $model->getFileStorageBucket();
+        $fileStorageBucket = $model->ensureFileStorageBucket();
         $returnedFileFullName = $model->getFileFullName();
 
         $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), 'Unable to save file from Web in the file storage bucket!');
@@ -257,7 +257,7 @@ class FileBehaviorTest extends TestCase
 
             $this->assertTrue($model->save(), 'Unable to save record with tabular input file!');
 
-            $fileStorageBucket = $model->getFileStorageBucket();
+            $fileStorageBucket = $model->ensureFileStorageBucket();
             $returnedFileFullName = $model->getFileFullName();
 
             $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), 'Unable to save file with tabular input!');

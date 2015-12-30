@@ -23,7 +23,7 @@ use yii\helpers\StringHelper;
  *
  * @see FileBehavior
  *
- * @property string $defaultFileTransformName public alias of {@link _defaultFileTransformName}.
+ * @property string $defaultFileTransformName name of the default file transformation.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
@@ -31,7 +31,7 @@ use yii\helpers\StringHelper;
 class TransformFileBehavior extends FileBehavior
 {
     /**
-     * @var array, which determines all possible file transformations.
+     * @var array determines all possible file transformations.
      * The key of array element is the name of transformation and will be used to create file name.
      * The value is an array of parameters for transformation. Its value depends on which [[transformCallback]] you are using.
      * If you wish to save original file without transformation, specify a key without value.
@@ -45,37 +45,51 @@ class TransformFileBehavior extends FileBehavior
      * ];
      * ```
      */
-    public $fileTransforms = [];
+    public $fileTransformations = [];
     /**
-     * @var callable a PHP callback, which will be called while file transforming.
+     * @var callable a PHP callback, which will be called while file transforming. The signature of the callback should
+     * be following: `boolean function(string $sourceFileName, string $destinationFileName, mixed $transformationSettings) {}`
      */
     public $transformCallback;
+    /**
+     * @var string path, which should be used for storing temporary files during transformation.
+     * If not set, default one will be composed inside '@runtime' directory.
+     * Path aliases like '@webroot' and '@runtime' can be used here.
+     */
+    public $transformationTempFilePath;
     /**
      * @var string|array URL(s), which is used to set up web links, which will be returned if requested file does not exists.
      * If may specify this parameter as string it will be considered as web link and will be used for all transformations.
      * For example:  'http://www.myproject.com/materials/default/image.jpg'
      * If you specify this parameter as an array, its key will be considered as transformation name, while value - as web link.
      * For example:
+     *
+     * ```php
      * [
      *     'full'=> 'http://www.myproject.com/materials/default/full.jpg',
      *     'thumbnail'=> 'http://www.myproject.com/materials/default/thumbnail.jpg',
      * ]
+     * ```
      */
     public $defaultFileUrl = [];
 
     /**
-     * @var string name of the file transformation, which should be used by default,
-     * if no specific transformation name given.
+     * @var string name of the file transformation, which should be used by default, if no specific transformation name given.
      */
     private $_defaultFileTransformName;
 
 
+    /**
+     * @param string $defaultFileTransformName name of the default file transformation.
+     */
     public function setDefaultFileTransformName($defaultFileTransformName)
     {
         $this->_defaultFileTransformName = $defaultFileTransformName;
-        return true;
     }
 
+    /**
+     * @return string name of the default file transformation.
+     */
     public function getDefaultFileTransformName()
     {
         if (empty($this->_defaultFileTransformName)) {
@@ -90,11 +104,11 @@ class TransformFileBehavior extends FileBehavior
      */
     protected function initDefaultFileTransformName()
     {
-        $fileTransforms = $this->ensureFileTransforms();
-        if (isset($fileTransforms[0])) {
-            return $fileTransforms[0];
+        $fileTransformations = $this->ensureFileTransforms();
+        if (isset($fileTransformations[0])) {
+            return $fileTransformations[0];
         } else {
-            $transformNames = array_keys($fileTransforms);
+            $transformNames = array_keys($fileTransformations);
             return array_shift($transformNames);
         }
     }
@@ -173,17 +187,17 @@ class TransformFileBehavior extends FileBehavior
     }
 
     /**
-     * Returns the [[fileTransforms]] value, making sure it is valid.
+     * Returns the [[fileTransformations]] value, making sure it is valid.
      * @throws InvalidConfigException if file transforms value is invalid.
      * @return array file transforms.
      */
     protected function ensureFileTransforms()
     {
-        $fileTransforms = $this->fileTransforms;
-        if (empty($fileTransforms)) {
+        $fileTransformations = $this->fileTransformations;
+        if (empty($fileTransformations)) {
             throw new InvalidConfigException('File transformations list is empty.');
         }
-        return $fileTransforms;
+        return $fileTransformations;
     }
 
     /**
@@ -199,11 +213,11 @@ class TransformFileBehavior extends FileBehavior
      */
     protected function newFile($sourceFileName, $fileVersion, $fileExtension)
     {
-        $fileTransforms = $this->ensureFileTransforms();
+        $fileTransformations = $this->ensureFileTransforms();
 
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         $result = true;
-        foreach ($fileTransforms as $fileTransformName => $fileTransform) {
+        foreach ($fileTransformations as $fileTransformName => $fileTransform) {
             if (!is_array($fileTransform) && is_numeric($fileTransformName)) {
                 $fileTransformName = $fileTransform;
             }
@@ -211,7 +225,7 @@ class TransformFileBehavior extends FileBehavior
             $fileFullName = $this->getFileFullName($fileTransformName, $fileVersion, $fileExtension);
 
             if (is_array($fileTransform)) {
-                $transformTempFilePath = $this->resolveTransformTempFilePath();
+                $transformTempFilePath = $this->ensureTransformationTempFilePath();
                 $tempTransformFileName = basename($fileFullName);
                 $tempTransformFileName = uniqid(rand()) . '_' . $tempTransformFileName;
                 $tempTransformFileName = $transformTempFilePath . DIRECTORY_SEPARATOR . $tempTransformFileName;
@@ -234,21 +248,23 @@ class TransformFileBehavior extends FileBehavior
     }
 
     /**
-     * Generates the temporary file path for the file transformations
-     * and makes sure it exists.
-     * @throws \Exception if fails.
+     * Ensures [[transformationTempFilePath]] exist and is writeable.
+     * @throws InvalidConfigException if fails.
      * @return string temporary full file path.
      */
-    protected function resolveTransformTempFilePath()
+    protected function ensureTransformationTempFilePath()
     {
-        $filePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . StringHelper::basename(get_class($this)) . DIRECTORY_SEPARATOR . StringHelper::basename(get_class($this->owner));
-        FileHelper::createDirectory($filePath);
-
-        if (!file_exists($filePath) || !is_dir($filePath)) {
-            throw new \Exception("Unable to resolve temporary file path: '{$filePath}'!");
-        } elseif (!is_writable($filePath)) {
-            throw new \Exception("Path: '{$filePath}' should be writeable!");
+        if ($this->transformationTempFilePath === null) {
+            $filePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . StringHelper::basename(get_class($this)) . DIRECTORY_SEPARATOR . StringHelper::basename(get_class($this->owner));
+            $this->transformationTempFilePath = $filePath;
+        } else {
+            $filePath = Yii::getAlias($this->transformationTempFilePath);
         }
+
+        if (!FileHelper::createDirectory($filePath)) {
+            throw new InvalidConfigException("Unable to resolve temporary file path: '{$filePath}'!");
+        }
+
         return $filePath;
     }
 
@@ -259,10 +275,10 @@ class TransformFileBehavior extends FileBehavior
      */
     public function deleteFile()
     {
-        $fileTransforms = $this->ensureFileTransforms();
+        $fileTransformations = $this->ensureFileTransforms();
         $result = true;
-        $fileStorageBucket = $this->getFileStorageBucket();
-        foreach ($fileTransforms as $fileTransformName => $fileTransform) {
+        $fileStorageBucket = $this->ensureFileStorageBucket();
+        foreach ($fileTransformations as $fileTransformName => $fileTransform) {
             if (!is_array($fileTransform) && is_numeric($fileTransformName)) {
                 $fileTransformName = $fileTransform;
             }
@@ -279,10 +295,10 @@ class TransformFileBehavior extends FileBehavior
      * Transforms source file to destination file according to the transformation settings.
      * @param string $sourceFileName is the full source file system name.
      * @param string $destinationFileName is the full destination file system name.
-     * @param mixed $transformSettings is the transform settings data, its value is retrieved from {@link fileTransforms}
+     * @param mixed $transformationSettings is the transform settings data, its value is retrieved from [[fileTransformations]]
      * @return boolean success.
      */
-    protected function transformFile($sourceFileName, $destinationFileName, $transformSettings)
+    protected function transformFile($sourceFileName, $destinationFileName, $transformationSettings)
     {
         $arguments = func_get_args();
         return call_user_func_array($this->transformCallback, $arguments);
@@ -297,7 +313,7 @@ class TransformFileBehavior extends FileBehavior
      */
     public function fileExists($name = null)
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         return $fileStorageBucket->fileExists($this->getFileFullName($name));
     }
 
@@ -308,7 +324,7 @@ class TransformFileBehavior extends FileBehavior
      */
     public function getFileContent($name = null)
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         return $fileStorageBucket->getFileContent($this->getFileFullName($name));
     }
 
@@ -319,7 +335,7 @@ class TransformFileBehavior extends FileBehavior
      */
     public function getFileUrl($name = null)
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         $fileFullName = $this->getFileFullName($name);
         $defaultFileUrl = $this->getDefaultFileUrl($name);
         if (!empty($defaultFileUrl)) {

@@ -3,6 +3,7 @@
 namespace yii2tech\tests\unit\ar\file;
 
 use Yii;
+use yii\helpers\FileHelper;
 use yii2tech\ar\file\ImageFileBehavior;
 use yii2tech\tests\unit\ar\file\data\ImageFile;
 
@@ -15,6 +16,13 @@ class ImageFileBehaviorTest extends TestCase
             return;
         }
         parent::setUp();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        FileHelper::removeDirectory(Yii::getAlias('@runtime/ImageFileBehavior'));
     }
 
     /**
@@ -35,7 +43,7 @@ class ImageFileBehaviorTest extends TestCase
 
         $model = ImageFile::findOne(1);
 
-        $imageTransforms = $model->fileTransforms;
+        $imageTransforms = $model->fileTransformations;
 
         $testFileName = $this->getTestImageFileFullName();
         $testFileExtension = $this->getFileExtension($testFileName);
@@ -46,7 +54,7 @@ class ImageFileBehaviorTest extends TestCase
 
         foreach ($imageTransforms as $imageTransformName => $imageTransform) {
             $returnedFileFullName = $model->getFileFullName($imageTransformName);
-            $fileStorageBucket = $model->getFileStorageBucket();
+            $fileStorageBucket = $model->ensureFileStorageBucket();
 
             $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), "File for transformation name '{$imageTransformName}' does not exist!");
             $this->assertEquals($this->getFileExtension($returnedFileFullName), $testFileExtension, 'Saved file has wrong extension!');

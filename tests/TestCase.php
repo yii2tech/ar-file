@@ -27,6 +27,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
         $this->destroyApplication();
 
         FileHelper::removeDirectory($this->getTestSourceBasePath());
@@ -112,7 +113,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getTestSourceBasePath()
     {
-        return Yii::getAlias('@yii2tech/tests/unit/ar/file/runtime/source') . DIRECTORY_SEPARATOR . getmypid();
+        return Yii::getAlias('@yii2tech/tests/unit/ar/file/runtime/source') . '_' . getmypid();
     }
 
     /**
@@ -121,7 +122,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getTestFileStorageBasePath()
     {
-        return Yii::getAlias('@yii2tech/tests/unit/ar/file/runtime/file-storage') . DIRECTORY_SEPARATOR . getmypid();
+        return Yii::getAlias('@yii2tech/tests/unit/ar/file/runtime/file-storage') . '_' . getmypid();
     }
 
     /**

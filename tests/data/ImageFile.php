@@ -14,7 +14,7 @@ class ImageFile extends File
         return [
             'file' => [
                 'class' => ImageFileBehavior::className(),
-                'fileTransforms' => [
+                'fileTransformations' => [
                     'full' => [800, 600],
                     'thumbnail' => [200, 150]
                 ],

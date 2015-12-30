@@ -15,7 +15,7 @@ class TransformFile extends File
             'file' => [
                 'class' => TransformFileBehavior::className(),
                 'transformCallback' => 'copy',
-                'fileTransforms' => [
+                'fileTransformations' => [
                     'default' => null,
                     'custom' => null
                 ],

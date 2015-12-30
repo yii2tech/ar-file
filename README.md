@@ -29,6 +29,21 @@ or add
 
 to the require section of your composer.json.
 
+If you wish to use [[yii2tech\ar\file\ImageFileBehavior]], you will also need to install [yiisoft/yii2-imagine](https://github.com/yiisoft/yii2-imagine),
+which is not required by default. In order to do so either run
+
+```
+php composer.phar require --prefer-dist yiisoft/yii2-imagine
+```
+
+or add
+
+```json
+"yiisoft/yii2-imagine": "*"
+```
+
+to the require section of your composer.json.
+
 
 Usage
 -----

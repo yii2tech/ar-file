@@ -23,7 +23,7 @@ class TransformFileBehaviorTest extends TestCase
         $behavior = new TransformFileBehavior();
 
         $defaultFileTransformName = 'test_default_file_transform_name';
-        $this->assertTrue($behavior->setDefaultFileTransformName($defaultFileTransformName), 'Unable to set default file transform name!');
+        $behavior->setDefaultFileTransformName($defaultFileTransformName);
         $this->assertEquals($defaultFileTransformName, $behavior->getDefaultFileTransformName(), 'Unable to set default file transform name!');
     }
 
@@ -37,7 +37,7 @@ class TransformFileBehaviorTest extends TestCase
         // Empty transform options:
         $behavior->setDefaultFileTransformName('');
         $expectedDefaultFileTransformName = 'default_file_transform_name_empty_transform_options';
-        $behavior->fileTransforms = [$expectedDefaultFileTransformName];
+        $behavior->fileTransformations = [$expectedDefaultFileTransformName];
 
         $returnedDefaultFileTransformName = $behavior->getDefaultFileTransformName();
         $this->assertEquals($expectedDefaultFileTransformName, $returnedDefaultFileTransformName, 'Unable to get default value of default file transform name from empty transform options!');
@@ -45,7 +45,7 @@ class TransformFileBehaviorTest extends TestCase
         // With transform options:
         $behavior->setDefaultFileTransformName('');
         $expectedDefaultFileTransformName = 'default_file_transform_name_has_transform_options';
-        $behavior->fileTransforms = [$expectedDefaultFileTransformName => []];
+        $behavior->fileTransformations = [$expectedDefaultFileTransformName => []];
 
         $returnedDefaultFileTransformName = $behavior->getDefaultFileTransformName();
         $this->assertEquals($expectedDefaultFileTransformName, $returnedDefaultFileTransformName, 'Unable to get default value of default file transform name with transform options!');
@@ -59,7 +59,7 @@ class TransformFileBehaviorTest extends TestCase
         /* @var $refreshedModel TransformFile|TransformFileBehavior */
 
         $model = TransformFile::findOne(1);
-        $fileTransforms = $model->fileTransforms;
+        $fileTransforms = $model->fileTransformations;
 
         $testFileName = $this->getTestFileFullName();
         $testFileExtension = $this->getFileExtension($testFileName);
@@ -70,7 +70,7 @@ class TransformFileBehaviorTest extends TestCase
 
         foreach ($fileTransforms as $fileTransformName => $fileTransform) {
             $returnedFileFullName = $model->getFileFullName($fileTransformName);
-            $fileStorageBucket = $model->getFileStorageBucket();
+            $fileStorageBucket = $model->ensureFileStorageBucket();
 
             $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), "File for transformation name '{$fileTransformName}' does not exist!");
             $this->assertEquals($this->getFileExtension($returnedFileFullName), $testFileExtension, 'Saved file has wrong extension!');
@@ -87,7 +87,7 @@ class TransformFileBehaviorTest extends TestCase
         /* @var $model TransformFile|TransformFileBehavior */
 
         $model = TransformFile::findOne(1);
-        $model->fileTransforms = [];
+        $model->fileTransformations = [];
 
         $testFileName = $this->getTestFileFullName();
 

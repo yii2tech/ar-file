@@ -54,8 +54,9 @@ class FileBehavior extends Behavior
      */
     public $fileStorage = 'fileStorage';
     /**
-     * @var string name of the file storage bucket, which stores the related files.
-     * If empty it will be generated automatically using owner class name and {@link fileAttribute}.
+     * @var string|BucketInterface name of the file storage bucket, which stores the related files or
+     * bucket instance itself.
+     * If empty, bucket name will be generated automatically using owner class name and [[fileAttribute]].
      */
     public $fileStorageBucket;
     /**
@@ -65,15 +66,16 @@ class FileBehavior extends Behavior
      * files in the subfolder with the name of model id. To use a dynamic value of attribute
      * place attribute name in curly brackets, for example: {id}.
      * You may also specify special placeholders:
-     * {pk} - resolved as primary key value of the owner model,
-     * {__model__} - resolved as class name of the owner model,
-     * {__file__} - resolved as value of {@link fileAttribute}.
+     *
+     * - {pk} - resolved as primary key value of the owner model,
+     * - {__model__} - resolved as class base name of the owner model,
+     * - {__file__} - resolved as value of [[fileAttribute]].
+     *
      * You may place symbols "^" before any placeholder name, such placeholder will be resolved as single
      * symbol of the normal value. Number of symbol determined by count of "^".
-     * For example:
-     * if model id equal to 54321, placeholder {^id} will be resolved as "5", {^^id} - as "4" and so on.
+     * For example: if model id equal to 54321, placeholder {^id} will be resolved as "5", {^^id} - as "4" and so on.
      * Example value:
-     * '{__model__}/{__file__}/{group_id}/{^pk}/{pk}'
+     * '{__model__}/{__file__}/{groupId}/{^pk}/{pk}'
      */
     public $subDirTemplate = '{^pk}/{pk}';
     /**
@@ -90,15 +92,14 @@ class FileBehavior extends Behavior
      * @var integer index of the HTML input file field in case of tabular input (input name has format "ModelName[$i][file]").
      * Note: after owner is saved this property will be reset.
      */
-    public $fileTabularInputIndex = null;
+    public $fileTabularInputIndex;
     /**
      * @var string URL which is used to set up web links, which will be returned, if requested file does not exists.
      * For example: 'http://www.myproject.com/materials/default/image.jpg'
      */
     public $defaultFileUrl;
     /**
-     * @var boolean indicates if behavior will attempt to fetch uploaded file automatically
-     * from the HTTP request.
+     * @var boolean indicates if behavior will attempt to fetch uploaded file automatically from the HTTP request.
      */
     public $autoFetchUploadedFile = true;
 
@@ -134,20 +135,23 @@ class FileBehavior extends Behavior
      * If no bucket exists attempts to create it.
      * @return BucketInterface file storage bucket instance.
      */
-    public function getFileStorageBucket()
+    public function ensureFileStorageBucket()
     {
-        /* @var StorageInterface $fileStorage */
-        $fileStorage = Instance::ensure($this->fileStorage, 'yii2tech\filestorage\StorageInterface');
+        if (!is_object($this->fileStorageBucket)) {
+            /* @var StorageInterface $fileStorage */
+            $fileStorage = Instance::ensure($this->fileStorage, 'yii2tech\filestorage\StorageInterface');
 
-        if ($this->fileStorageBucket === null) {
-            $bucketName = $this->defaultFileStorageBucketName();
-        } else {
-            $bucketName = $this->fileStorageBucket;
+            if ($this->fileStorageBucket === null) {
+                $bucketName = $this->defaultFileStorageBucketName();
+            } else {
+                $bucketName = $this->fileStorageBucket;
+            }
+            if (!$fileStorage->hasBucket($bucketName)) {
+                $fileStorage->addBucket($bucketName);
+            }
+            $this->fileStorageBucket = $fileStorage->getBucket($bucketName);
         }
-        if (!$fileStorage->hasBucket($bucketName)) {
-            $fileStorage->addBucket($bucketName);
-        }
-        return $fileStorage->getBucket($bucketName);
+        return $this->fileStorageBucket;
     }
 
     /**
@@ -162,7 +166,7 @@ class FileBehavior extends Behavior
     // SubDir Template:
 
     /**
-     * Gets file storage sub dirs path, resolving {@link subDirTemplate}.
+     * Gets file storage sub dirs path, resolving [[subDirTemplate]].
      * @return string actual sub directory string.
      */
     public function getActualSubDir()
@@ -176,7 +180,7 @@ class FileBehavior extends Behavior
     }
 
     /**
-     * Internal callback function for {@link getActualSubDir}.
+     * Internal callback function for [[getActualSubDir()]].
      * @param array $matches - set of regular expression matches.
      * @return string replacement for the match.
      */
@@ -291,7 +295,7 @@ class FileBehavior extends Behavior
 
     /**
      * Creates the file name in the file storage.
-     * This name contains the sub directory, resolved by {@link subDirTemplate}.
+     * This name contains the sub directory, resolved by [[subDirTemplate]].
      * @param integer $fileVersion file version number.
      * @param string $fileExtension file extension.
      * @return string file full name.
@@ -312,7 +316,7 @@ class FileBehavior extends Behavior
      * Associate new file with the owner model.
      * This method will determine new file version and extension, and will update the owner
      * model correspondingly.
-     * @param string|UploadedFile $sourceFileNameOrUploadedFile file system path to source file or {@link CUploadedFile} instance.
+     * @param string|UploadedFile $sourceFileNameOrUploadedFile file system path to source file or [[UploadedFile]] instance.
      * @param boolean $deleteSourceFile determines would the source file be deleted in the process or not,
      * if null given file will be deleted if it was uploaded via POST.
      * @return boolean save success.
@@ -364,7 +368,7 @@ class FileBehavior extends Behavior
     protected function newFile($sourceFileName, $fileVersion, $fileExtension)
     {
         $fileFullName = $this->getFileFullName($fileVersion, $fileExtension);
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         return $fileStorageBucket->copyFileIn($sourceFileName, $fileFullName);
     }
 
@@ -374,7 +378,7 @@ class FileBehavior extends Behavior
      */
     public function deleteFile()
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         $fileName = $this->getFileFullName();
         if ($fileStorageBucket->fileExists($fileName)) {
             return $fileStorageBucket->deleteFile($fileName);
@@ -433,7 +437,7 @@ class FileBehavior extends Behavior
      */
     public function fileExists()
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         return $fileStorageBucket->fileExists($this->getFileFullName());
     }
 
@@ -443,7 +447,7 @@ class FileBehavior extends Behavior
      */
     public function getFileContent()
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         return $fileStorageBucket->getFileContent($this->getFileFullName());
     }
 
@@ -453,7 +457,7 @@ class FileBehavior extends Behavior
      */
     public function getFileUrl()
     {
-        $fileStorageBucket = $this->getFileStorageBucket();
+        $fileStorageBucket = $this->ensureFileStorageBucket();
         $fileFullName = $this->getFileFullName();
         if ($this->defaultFileUrl !== null) {
             if (!$fileStorageBucket->fileExists($fileFullName)) {

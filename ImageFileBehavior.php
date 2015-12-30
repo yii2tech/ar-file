@@ -15,9 +15,9 @@ use yii\imagine\Image;
  * ImageFileBehavior is developed for the managing image files.
  * Behavior allows to set up several different transformations for image, so actually several files will be related to the one record in the database table. 
  * You can set up the [[transformCallback]] in order to specify transformation method(s).
- * By default behavior attempts to call convert method of the [[imageFileConvertorComponentName]] application component.
+ * By default behavior resizes images, using [[Image::thumbnail()]].
  *
- * In order to specify image resizing, you should set [[fileTransforms]] field.
+ * In order to specify image resizing, you should set [[fileTransformations]] field.
  * For example:
  *
  * ```php
@@ -50,28 +50,21 @@ use yii\imagine\Image;
 class ImageFileBehavior extends TransformFileBehavior
 {
     /**
-     * @var string name of the application component, which should be used to convert image files.
-     */
-    public $imageFileConvertorComponentName = 'imageFileConvertor';
-
-
-    /**
      * @inheritdoc
      */
-    protected function transformFile($sourceFileName, $destinationFileName, $transformSettings)
+    protected function transformFile($sourceFileName, $destinationFileName, $transformationSettings)
     {
         if ($this->transformCallback === null) {
-            return $this->transformImageFileResize($sourceFileName, $destinationFileName, $transformSettings);
+            return $this->transformImageFileResize($sourceFileName, $destinationFileName, $transformationSettings);
         }
-        return parent::transformFile($sourceFileName, $destinationFileName, $transformSettings);
+        return parent::transformFile($sourceFileName, $destinationFileName, $transformationSettings);
     }
 
     /**
-     * Transforms source file to destination file according to the transformation settings,
-     * using ImageMagic tool.
+     * Resizes source file to destination file according to the transformation settings, using [[Image::thumbnail()]].
      * @param string $sourceFileName is the full source file system name.
      * @param string $destinationFileName is the full destination file system name.
-     * @param array $transformSettings is the transform settings data, it should be the pair: imageWidth & imageHeight,
+     * @param array $transformSettings is the transform settings data, it should be the pair: 'imageWidth' and 'imageHeight',
      * For example: `[800, 600]`
      * @throws InvalidConfigException on invalid transform settings.
      * @return boolean success.
