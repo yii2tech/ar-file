@@ -399,7 +399,7 @@ class FileBehavior extends Behavior
             return $uploadedFile;
         }
 
-        if ($uploadedFile !== null) {
+        if (!empty($uploadedFile)) {
             return new UploadedFile([
                 'name' => basename($uploadedFile),
                 'tempName' => $uploadedFile,
