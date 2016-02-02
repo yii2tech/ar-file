@@ -31,6 +31,10 @@ use yii\helpers\StringHelper;
 class TransformFileBehavior extends FileBehavior
 {
     /**
+     * @inheritdoc
+     */
+    public $subDirTemplate = '{^^pk}/{^pk}/{pk}';
+    /**
      * @var array determines all possible file transformations.
      * The key of array element is the name of transformation and will be used to create file name.
      * The value is an array of parameters for transformation. Its value depends on which [[transformCallback]] you are using.

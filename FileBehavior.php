@@ -77,7 +77,7 @@ class FileBehavior extends Behavior
      * Example value:
      * '{__model__}/{__file__}/{groupId}/{^pk}/{pk}'
      */
-    public $subDirTemplate = '{^pk}/{pk}';
+    public $subDirTemplate = '{^^pk}/{^pk}';
     /**
      * @var string name of model's attribute, which will be used to store file extension.
      * Corresponding model's attribute should be a string type.
