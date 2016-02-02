@@ -11,8 +11,7 @@ use yii\base\InvalidConfigException;
 use yii\imagine\Image;
 
 /**
- * Extension of the [[TransformFileBehavior]] - behavior for the ActiveRecord.
- * ImageFileBehavior is developed for the managing image files.
+ * ImageFileBehavior is an enhanced version of [[TransformFileBehavior]] developed for the managing image files.
  * Behavior allows to set up several different transformations for image, so actually several files will be related to the one record in the database table. 
  * You can set up the [[transformCallback]] in order to specify transformation method(s).
  * By default behavior resizes images, using [[Image::thumbnail()]].
@@ -33,7 +32,7 @@ use yii\imagine\Image;
  * ```php
  * [
  *     'origin',
- *     'full' => [800, 600],
+ *     'main' => [800, 600],
  *     'thumbnail' => [200, 150]
  * ];
  * ```

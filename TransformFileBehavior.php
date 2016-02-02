@@ -13,8 +13,8 @@ use yii\helpers\FileHelper;
 use yii\helpers\StringHelper;
 
 /**
- * Extension of the [[FileBehavior]] - behavior for the CActiveRecord.
- * TransformFileBehavior is developed for the managing files, which require some post processing.
+ * TransformFileBehavior is an enhanced version of the [[FileBehavior]] developed for the managing files,
+ * which require some post processing.
  * Behavior allows to set up several different transformations for the file, so actually several files will
  * be related to the one record in the database table.
  * You can set up the [[transformCallback]] in order to specify transformation method(s).
@@ -70,8 +70,8 @@ class TransformFileBehavior extends FileBehavior
      *
      * ```php
      * [
-     *     'full'=> 'http://www.myproject.com/materials/default/full.jpg',
-     *     'thumbnail'=> 'http://www.myproject.com/materials/default/thumbnail.jpg',
+     *     'full' => 'http://www.myproject.com/materials/default/full.jpg',
+     *     'thumbnail' => 'http://www.myproject.com/materials/default/thumbnail.jpg',
      * ]
      * ```
      */
