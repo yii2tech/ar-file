@@ -1,8 +1,8 @@
 Yii 2 ActiveRecord File Attachment extension Change Log
 =======================================================
 
-1.0.1 under development
------------------------
+1.0.1, February 14, 2016
+------------------------
 
 - Bug #1: Fixed required version of "yii2tech/file-storage" preventing stable release composer install (klimov-paul)
 
