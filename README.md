@@ -268,7 +268,12 @@ class Item extends \yii\db\ActiveRecord
                 'fileExtensionAttribute' => 'fileExtension',
                 'fileVersionAttribute' => 'fileVersion',
                 'transformCallback' => function ($sourceFileName, $destinationFileName, $options) {
-                    Image::thumbnail($sourceFileName, $options['width'], $options['height'])->save($destinationFileName);
+                    try {
+                        Image::thumbnail($sourceFileName, $options['width'], $options['height'])->save($destinationFileName);
+                        return true;
+                    } catch (\Exception $e) {
+                        return false;
+                    }
                 },
                 'fileTransformations' => [
                     'origin', // no transformation
