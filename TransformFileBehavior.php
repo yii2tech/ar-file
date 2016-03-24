@@ -53,6 +53,7 @@ class TransformFileBehavior extends FileBehavior
     /**
      * @var callable a PHP callback, which will be called while file transforming. The signature of the callback should
      * be following: `boolean function(string $sourceFileName, string $destinationFileName, mixed $transformationSettings) {}`
+     * Callback should return boolean, which indicates whether transformation was successful or not.
      */
     public $transformCallback;
     /**
