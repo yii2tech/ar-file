@@ -112,10 +112,9 @@ class TransformFileBehavior extends FileBehavior
         $fileTransformations = $this->ensureFileTransforms();
         if (isset($fileTransformations[0])) {
             return $fileTransformations[0];
-        } else {
-            $transformNames = array_keys($fileTransformations);
-            return array_shift($transformNames);
         }
+        $transformNames = array_keys($fileTransformations);
+        return array_shift($transformNames);
     }
 
     /**
@@ -128,13 +127,11 @@ class TransformFileBehavior extends FileBehavior
         if (is_array($this->defaultFileUrl)) {
             if (!empty($name)) {
                 return $this->defaultFileUrl[$name];
-            } else {
-                reset($this->defaultFileUrl);
-                return current($this->defaultFileUrl);
             }
-        } else {
-            return $this->defaultFileUrl;
+            reset($this->defaultFileUrl);
+            return current($this->defaultFileUrl);
         }
+        return $this->defaultFileUrl;
     }
 
     /**

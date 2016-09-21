@@ -54,7 +54,8 @@ class TransformFileBehaviorTest extends TestCase
     /**
      * @depends testSetGet
      */
-    public function testSaveFile() {
+    public function testSaveFile()
+    {
         /* @var $model TransformFile|TransformFileBehavior */
         /* @var $refreshedModel TransformFile|TransformFileBehavior */
 

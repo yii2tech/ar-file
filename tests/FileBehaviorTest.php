@@ -42,7 +42,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testGetFileStorageBucket
      */
-    public function testGetFileStorageBucketIfNotExists() {
+    public function testGetFileStorageBucketIfNotExists()
+    {
         /* @var $model File|FileBehavior */
 
         Yii::$app->fileStorage->setBuckets([]);
@@ -58,7 +59,8 @@ class FileBehaviorTest extends TestCase
         $this->assertEquals($testBucketName, $fileStorageBucket->getName(), 'Returned file storage bucket has incorrect name!');
     }
 
-    public function testGetActualSubDirPath() {
+    public function testGetActualSubDirPath()
+    {
         /* @var $model File|FileBehavior */
 
         $model = File::findOne(1);
@@ -94,7 +96,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testGetActualSubDirPath
      */
-    public function testSaveFile() {
+    public function testSaveFile()
+    {
         /* @var $model File|FileBehavior */
         /* @var $refreshedModel File|FileBehavior */
 
@@ -119,7 +122,8 @@ class FileBehaviorTest extends TestCase
         $this->assertEquals($refreshedModel->getFileFullName(), $returnedFileFullName, 'Wrong file full name returned from the refreshed record!');
     }
 
-    public function testGetUploadedFileFromRequest() {
+    public function testGetUploadedFileFromRequest()
+    {
         /* @var $model File|FileBehavior */
 
         $model = new File();
@@ -133,7 +137,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testGetUploadedFileFromRequest
      */
-    public function testGetUploadedFileFromRequestDisabledAutoFetch() {
+    public function testGetUploadedFileFromRequestDisabledAutoFetch()
+    {
         /* @var $model File|FileBehavior */
 
         $model = new File();
@@ -148,7 +153,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testGetUploadedFileFromRequest
      */
-    public function testGetUploadedFileFromRequestTwice() {
+    public function testGetUploadedFileFromRequestTwice()
+    {
         /* @var $model File|FileBehavior */
 
         $model = new File();
@@ -168,7 +174,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testSaveFile
      */
-    public function testFilePropertySetUp() {
+    public function testFilePropertySetUp()
+    {
         /* @var $model File|FileBehavior */
 
         $modelModel = new File();
@@ -186,7 +193,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testSaveFile
      */
-    public function testModelSave() {
+    public function testModelSave()
+    {
         /* @var $model File|FileBehavior */
 
         $model = File::findOne(1);
@@ -209,7 +217,8 @@ class FileBehaviorTest extends TestCase
     /**
      * @depends testSaveFile
      */
-    public function testSaveFileFromWeb() {
+    public function testSaveFileFromWeb()
+    {
         /* @var $model File|FileBehavior */
 
         $model = new File();

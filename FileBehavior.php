@@ -239,11 +239,9 @@ class FileBehavior extends Behavior
         $owner = $this->owner;
         $primaryKey = $owner->getPrimaryKey();
         if (is_array($primaryKey)) {
-            $result = implode('_', $primaryKey);
-        } else {
-            $result = $primaryKey;
+            return implode('_', $primaryKey);
         }
-        return $result;
+        return $primaryKey;
     }
 
     /**
@@ -426,6 +424,7 @@ class FileBehavior extends Behavior
                 }
             }
         }
+
         return null;
     }
 
