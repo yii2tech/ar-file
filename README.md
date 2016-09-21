@@ -303,6 +303,44 @@ echo $model->getFileUrl('main'); // outputs URL for the medium-sized image
 echo $model->getFileUrl('thumbnail'); // outputs URL for the thumbnail image
 ```
 
+Some file transformations may require changing the file extension. For example: you may want to create a preview for the
+*.psd file in *.jpg format. You may specify file extension per each transformation using [[\yii2tech\ar\file\TransformFileBehavior::transformationFileExtensions]].
+For example:
+
+```php
+use yii2tech\ar\file\TransformFileBehavior;
+use yii\imagine\Image;
+
+class Item extends \yii\db\ActiveRecord
+{
+    public function behaviors()
+    {
+        return [
+            'file' => [
+                'class' => TransformFileBehavior::className(),
+                'fileTransformations' => [
+                    'origin', // no transformation
+                    'preview' => [
+                        // ...
+                    ],
+                    'web' => [
+                        // ...
+                    ],
+                ],
+                'transformationFileExtensions' => [
+                    'preview' => 'jpg',
+                    'web' => function ($fileExtension) {
+                        return in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']) ? $fileExtension : 'jpg';
+                    },
+                ],
+                // ...
+            ],
+        ];
+    }
+    // ...
+}
+```
+
 
 ## Image file transformation <span id="image-file-transformation"></span>
 
