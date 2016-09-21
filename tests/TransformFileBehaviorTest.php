@@ -3,6 +3,7 @@
 namespace yii2tech\tests\unit\ar\file;
 
 use yii2tech\ar\file\TransformFileBehavior;
+use yii2tech\tests\unit\ar\file\data\TransformExtensionFile;
 use yii2tech\tests\unit\ar\file\data\TransformFile;
 
 class TransformFileBehaviorTest extends TestCase
@@ -60,7 +61,7 @@ class TransformFileBehaviorTest extends TestCase
         /* @var $refreshedModel TransformFile|TransformFileBehavior */
 
         $model = TransformFile::findOne(1);
-        $fileTransforms = $model->fileTransformations;
+        $fileTransformations = $model->fileTransformations;
 
         $testFileName = $this->getTestFileFullName();
         $testFileExtension = $this->getFileExtension($testFileName);
@@ -68,15 +69,15 @@ class TransformFileBehaviorTest extends TestCase
         $this->assertTrue($model->saveFile($testFileName), 'Unable to save file!');
 
         $refreshedModel = TransformFile::findOne($model->getPrimaryKey());
+        $fileStorageBucket = $model->ensureFileStorageBucket();
 
-        foreach ($fileTransforms as $fileTransformName => $fileTransform) {
-            $returnedFileFullName = $model->getFileFullName($fileTransformName);
-            $fileStorageBucket = $model->ensureFileStorageBucket();
+        foreach ($fileTransformations as $transformationName => $transformation) {
+            $returnedFileFullName = $model->getFileFullName($transformationName);
 
-            $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), "File for transformation name '{$fileTransformName}' does not exist!");
+            $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), "File for transformation name '{$transformationName}' does not exist!");
             $this->assertEquals($this->getFileExtension($returnedFileFullName), $testFileExtension, 'Saved file has wrong extension!');
 
-            $this->assertEquals($refreshedModel->getFileFullName($fileTransformName), $returnedFileFullName, 'Wrong full file name from the refreshed record!');
+            $this->assertEquals($refreshedModel->getFileFullName($transformationName), $returnedFileFullName, 'Wrong full file name from the refreshed record!');
         }
     }
 
@@ -153,5 +154,62 @@ class TransformFileBehaviorTest extends TestCase
         $this->assertEquals($model->getFileFullName($defaultFileTransformName), $model->getFileFullName(), 'Unable to get file full name for default file transform!');
         $this->assertEquals($model->getFileContent($defaultFileTransformName), $model->getFileContent(), 'Unable to get file content for default file transform!');
         $this->assertEquals($model->getFileUrl($defaultFileTransformName), $model->getFileUrl(), 'Unable to get file URL for default file transform!');
+    }
+
+    public function testTransformFileExtensions()
+    {
+        /* @var $model TransformExtensionFile|TransformFileBehavior */
+
+        $model = TransformExtensionFile::findOne(1);
+        $model->fileVersion = '1';
+        $model->fileExtension = 'dat';
+
+        $fileName = $model->getFileSelfName('origin');
+        $this->assertEquals('.dat', substr($fileName, -4));
+
+        $fileName = $model->getFileSelfName('text');
+        $this->assertEquals('.txt', substr($fileName, -4));
+
+        $model->transformationFileExtensions = [
+            'callback' => function($extension) {
+                return $extension . '_callback';
+            },
+        ];
+        $fileName = $model->getFileSelfName('callback');
+        $this->assertEquals('.dat_callback', substr($fileName, -13));
+
+        $model->transformationFileExtensions = function($extension, $transformation) {
+            return $transformation . '_' . $extension;
+        };
+        $fileName = $model->getFileSelfName('callback');
+        $this->assertEquals('.callback_dat', substr($fileName, -13));
+    }
+
+    /**
+     * @depends testSaveFile
+     */
+    public function testSaveFileWithTransformationExtensions()
+    {
+        /* @var $model TransformExtensionFile|TransformFileBehavior */
+        /* @var $refreshedModel TransformExtensionFile|TransformFileBehavior */
+
+        $model = TransformExtensionFile::findOne(1);
+
+        $testFileName = $this->getTestFileFullName();
+        $testFileExtension = $this->getFileExtension($testFileName);
+
+        $this->assertTrue($model->saveFile($testFileName), 'Unable to save file!');
+
+        $refreshedModel = TransformExtensionFile::findOne($model->getPrimaryKey());
+        $fileStorageBucket = $model->ensureFileStorageBucket();
+
+        foreach (['origin' => $testFileExtension, 'text' => 'txt'] as $transformationName => $extension) {
+            $returnedFileFullName = $model->getFileFullName($transformationName);
+
+            $this->assertTrue($fileStorageBucket->fileExists($returnedFileFullName), "File for transformation name '{$transformationName}' does not exist!");
+            $this->assertEquals($this->getFileExtension($returnedFileFullName), $extension, 'Saved file has wrong extension!');
+
+            $this->assertEquals($refreshedModel->getFileFullName($transformationName), $returnedFileFullName, 'Wrong full file name from the refreshed record!');
+        }
     }
 }

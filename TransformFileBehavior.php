@@ -52,10 +52,50 @@ class TransformFileBehavior extends FileBehavior
     public $fileTransformations = [];
     /**
      * @var callable a PHP callback, which will be called while file transforming. The signature of the callback should
-     * be following: `boolean function(string $sourceFileName, string $destinationFileName, mixed $transformationSettings) {}`
+     * be following:
+     *
+     * ```php
+     * function(string $sourceFileName, string $destinationFileName, mixed $transformationSettings) {
+     *     //return boolean;
+     * }
+     * ```
+     *
      * Callback should return boolean, which indicates whether transformation was successful or not.
      */
     public $transformCallback;
+    /**
+     * @var array|callable|null file extension specification for the file transformation results.
+     * This value can be an array in format: [transformationName => fileExtension], for example:
+     *
+     * ```php
+     * [
+     *     'preview' => 'jpg',
+     *     'archive' => 'zip',
+     * ]
+     * ```
+     *
+     * Each extension specification can be a PHP callback, which accepts original extension and should return actual.
+     * For example:
+     *
+     * ```php
+     * [
+     *     'image' => function ($fileExtension) {
+     *         return in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']) ? $fileExtension : 'jpg';
+     *     },
+     * ]
+     * ```
+     *
+     * You may specify this field as a single PHP callback of following signature:
+     *
+     * ```php
+     * function (string $fileExtension, string $transformationName) {
+     *     //return string actual extension;
+     * }
+     * ```
+     *
+     * @since 1.0.2
+     */
+    public $transformationFileExtensions;
     /**
      * @var string path, which should be used for storing temporary files during transformation.
      * If not set, default one will be composed inside '@runtime' directory.
@@ -65,7 +105,7 @@ class TransformFileBehavior extends FileBehavior
     /**
      * @var string|array URL(s), which is used to set up web links, which will be returned if requested file does not exists.
      * If may specify this parameter as string it will be considered as web link and will be used for all transformations.
-     * For example:  'http://www.myproject.com/materials/default/image.jpg'
+     * For example: 'http://www.myproject.com/materials/default/image.jpg'
      * If you specify this parameter as an array, its key will be considered as transformation name, while value - as web link.
      * For example:
      *
@@ -144,16 +184,46 @@ class TransformFileBehavior extends FileBehavior
      */
     public function getFileSelfName($fileTransformName = null, $fileVersion = null, $fileExtension = null)
     {
-        $owner = $this->owner;
         $fileTransformName = $this->fetchFileTransformName($fileTransformName);
         $fileNamePrefix = '_' . $fileTransformName;
         if (is_null($fileVersion)) {
             $fileVersion = $this->getCurrentFileVersion();
         }
-        if (is_null($fileExtension)) {
-            $fileExtension = $owner->getAttribute($this->fileExtensionAttribute);
-        }
+
+        $fileExtension = $this->getActualFileExtension($fileExtension, $fileTransformName);
+
         return $this->getFileBaseName() . $fileNamePrefix . '_' . $fileVersion . '.' . $fileExtension;
+    }
+
+    /**
+     * Returns actual file extension for the particular transformation taking in account value of [[transformationFileExtensions]].
+     * @param string|null $fileExtension original file extension.
+     * @param string $fileTransformName file transformation name.
+     * @return string actual file extension to be used.
+     * @since 1.0.2
+     */
+    private function getActualFileExtension($fileExtension, $fileTransformName)
+    {
+        if ($fileExtension === null) {
+            $fileExtension = $this->owner->getAttribute($this->fileExtensionAttribute);
+        }
+
+        if ($this->transformationFileExtensions === null) {
+            return $fileExtension;
+        }
+
+        if (is_callable($this->transformationFileExtensions)) {
+            return call_user_func($this->transformationFileExtensions, $fileExtension, $fileTransformName);
+        }
+
+        if (isset($this->transformationFileExtensions[$fileTransformName])) {
+            if (is_string($this->transformationFileExtensions[$fileTransformName])) {
+                return $this->transformationFileExtensions[$fileTransformName];
+            }
+            return call_user_func($this->transformationFileExtensions[$fileTransformName], $fileExtension);
+        }
+
+        return $fileExtension;
     }
 
     /**
