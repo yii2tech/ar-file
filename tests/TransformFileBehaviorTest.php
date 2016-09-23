@@ -107,9 +107,11 @@ class TransformFileBehaviorTest extends TestCase
         $model = TransformFile::findOne(1);
 
         // Single string:
-        $model->defaultFileUrl = null;
+        $model->defaultFileUrl = [];
         $returnedFileWebSrc = $model->getFileUrl();
-        $this->assertFalse(empty($returnedFileWebSrc), 'Unable to get file web src with empty default one!');
+        $this->assertNotEmpty($returnedFileWebSrc, 'Unable to get file web src with empty default one!');
+        $returnedFileWebSrc = $model->getFileUrl('custom');
+        $this->assertNotEmpty($returnedFileWebSrc, 'Unable to get explicit transformation file web src with empty default one!');
 
         $testDefaultFileWebSrc = 'http://test/default/file/web/src';
         $model->defaultFileUrl = $testDefaultFileWebSrc;

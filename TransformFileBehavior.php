@@ -164,13 +164,18 @@ class TransformFileBehavior extends FileBehavior
      */
     public function getDefaultFileUrl($name = null)
     {
+        if (empty($this->defaultFileUrl)) {
+            return null;
+        }
+
         if (is_array($this->defaultFileUrl)) {
-            if (!empty($name)) {
+            if (isset($this->defaultFileUrl[$name])) {
                 return $this->defaultFileUrl[$name];
             }
             reset($this->defaultFileUrl);
             return current($this->defaultFileUrl);
         }
+
         return $this->defaultFileUrl;
     }
 
