@@ -341,6 +341,16 @@ class Item extends \yii\db\ActiveRecord
 }
 ```
 
+You may face the issue, when settings for some file transformations change or new transformation added, as your project
+evolves, making existing saved files outdated. In this case you can use [[\yii2tech\ar\file\TransformFileBehavior::regenerateFileTransformations()]]
+method to regenerate transformation files with new settings using some existing transformation as source.
+For example:
+
+```php
+$model = Item::findOne(1);
+$model->regenerateFileTransformations('origin'); // regenerate transformations using 'origin' as a source
+```
+
 
 ## Image file transformation <span id="image-file-transformation"></span>
 
