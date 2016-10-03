@@ -241,7 +241,7 @@ class TransformFileBehavior extends FileBehavior
      */
     public function getFileFullName($fileTransformName = null, $fileVersion = null, $fileExtension = null)
     {
-        $fileName = $this->getFileSelfName($fileTransformName, $fileVersion,$fileExtension);
+        $fileName = $this->getFileSelfName($fileTransformName, $fileVersion, $fileExtension);
         $subDir = $this->getActualSubDir();
         if (!empty($subDir)) {
             $fileName = $subDir . DIRECTORY_SEPARATOR . $fileName;
@@ -379,6 +379,25 @@ class TransformFileBehavior extends FileBehavior
     {
         $arguments = func_get_args();
         return call_user_func_array($this->transformCallback, $arguments);
+    }
+
+    /**
+     * Re-saves associated file, regenerating all available file transformations.
+     * This method is useful in case settings for some transformations have been changed and you need to update existing records.
+     * Note that this method will increment the file version.
+     * @param string|null $sourceTransformationName name of the file transformation, which should be used as source file,
+     * if not set - default transformation will be used.
+     * @return boolean success.
+     * @since 1.0.2
+     */
+    public function regenerateFileTransformations($sourceTransformationName = null)
+    {
+        $fileFullName = $this->getFileFullName($sourceTransformationName);
+        $fileStorageBucket = $this->ensureFileStorageBucket();
+
+        $tmpFileName = tempnam(Yii::getAlias('@runtime'), 'tmp_' . StringHelper::basename(get_class($this->owner)) . '_') . '.' . $this->owner->getAttribute($this->fileExtensionAttribute);
+        $fileStorageBucket->copyFileOut($fileFullName, $tmpFileName);
+        return $this->saveFile($tmpFileName, true);
     }
 
     // File Interface Function Shortcuts:

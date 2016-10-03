@@ -214,4 +214,27 @@ class TransformFileBehaviorTest extends TestCase
             $this->assertEquals($refreshedModel->getFileFullName($transformationName), $returnedFileFullName, 'Wrong full file name from the refreshed record!');
         }
     }
+
+    /**
+     * @depends testSaveFile
+     */
+    public function testRegenerateFileTransformations()
+    {
+        /* @var $model TransformFile|TransformFileBehavior */
+        /* @var $refreshedModel TransformFile|TransformFileBehavior */
+
+        $model = TransformFile::findOne(1);
+        $model->fileTransformations = ['default'];
+
+        $testFileName = $this->getTestFileFullName();
+
+        $model->saveFile($testFileName);
+
+        $refreshedModel = TransformFile::findOne($model->getPrimaryKey());
+
+        $this->assertFalse($refreshedModel->fileExists('custom'));
+
+        $this->assertTrue($refreshedModel->regenerateFileTransformations('default'));
+        $this->assertTrue($refreshedModel->fileExists('custom'));
+    }
 }

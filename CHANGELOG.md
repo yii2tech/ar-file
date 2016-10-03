@@ -6,6 +6,7 @@ Yii 2 ActiveRecord File Attachment extension Change Log
 
 - Bug #4: Fixed `TransformFileBehavior::getFileUrl()` triggers `E_NOTICE` in case `defaultFileUrl` is an empty array (klimov-paul)
 - Enh #3: Added support for transformed file extension variation via `TransformFileBehavior::transformationFileExtensions` (klimov-paul)
+- Enh #5: Added `TransformFileBehavior::regenerateFileTransformations()` method, allowing regeneration of the file transformations (klimov-paul)
 
 
 1.0.1, February 14, 2016
