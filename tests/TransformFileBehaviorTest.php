@@ -237,4 +237,28 @@ class TransformFileBehaviorTest extends TestCase
         $this->assertTrue($refreshedModel->regenerateFileTransformations('default'));
         $this->assertTrue($refreshedModel->fileExists('custom'));
     }
+
+    /**
+     * @depends testSaveFile
+     */
+    public function testOpenFile()
+    {
+        /* @var $model TransformFile|TransformFileBehavior */
+        /* @var $refreshedModel TransformFile|TransformFileBehavior */
+
+        $model = TransformFile::findOne(1);
+        $fileTransformations = $model->fileTransformations;
+
+        $testFileName = $this->getTestFileFullName();
+
+        $this->assertTrue($model->saveFile($testFileName), 'Unable to save file!');
+
+        $refreshedModel = TransformFile::findOne($model->getPrimaryKey());
+
+        foreach ($fileTransformations as $transformationName => $transformation) {
+            $resource = $refreshedModel->openFile('r', $transformationName);
+            $this->assertTrue(is_resource($resource));
+            fclose($resource);
+        }
+    }
 }

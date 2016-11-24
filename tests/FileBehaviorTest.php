@@ -293,4 +293,33 @@ class FileBehaviorTest extends TestCase
         $returnedFileWebSrc = $model->getFileUrl();
         $this->assertEquals($returnedFileWebSrc, $testDefaultFileWebSrc, 'Default file web src does not used!');
     }
+
+    /**
+     * @depends testSaveFile
+     */
+    public function testOpenFile()
+    {
+        /* @var $model File|FileBehavior */
+        /* @var $refreshedModel File|FileBehavior */
+
+        $model = new File();
+        $model->fileExtension = 'txt';
+        $model->fileVersion = 1;
+        $model->save(false);
+
+        $resource = $model->openFile('w');
+        $this->assertTrue(is_resource($resource));
+
+        $fileContent = 'test file content';
+        fwrite($resource, $fileContent);
+        fclose($resource);
+
+        $refreshedModel = File::findOne($model->id);
+
+        $resource = $refreshedModel->openFile('r');
+        $this->assertTrue(is_resource($resource));
+
+        $this->assertEquals($fileContent, stream_get_contents($resource));
+        fclose($resource);
+    }
 }

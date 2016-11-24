@@ -466,6 +466,20 @@ class FileBehavior extends Behavior
         return $fileStorageBucket->getFileUrl($fileFullName);
     }
 
+    /**
+     * Opens a file as stream resource, e.g. like `fopen()` function.
+     * @param string $mode - the type of access you require to the stream, e.g. `r`, `w`, `a` and so on.
+     * You should prefer usage of simple modes like `r` and `w`, avoiding complex ones like `w+`, as they
+     * may not supported by some storages.
+     * @return resource|false file pointer resource on success, or `false` on error.
+     * @since 1.0.3
+     */
+    public function openFile($mode)
+    {
+        $fileStorageBucket = $this->ensureFileStorageBucket();
+        return $fileStorageBucket->openFile($this->getFileFullName(), $mode);
+    }
+
     // Property Access Extension:
 
     /**

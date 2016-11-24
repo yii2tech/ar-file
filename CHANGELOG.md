@@ -1,6 +1,12 @@
 Yii 2 ActiveRecord File Attachment extension Change Log
 =======================================================
 
+1.0.3 under development
+-----------------------
+
+- Enh #6: Added `FileBehavior::openFile()` method as a shortcut to `yii2tech\filestorage\BucketInterface::openFile()` (klimov-paul)
+
+
 1.0.2, October 7, 2016
 ----------------------
 
