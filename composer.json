@@ -1,7 +1,7 @@
 {
     "name": "yii2tech/ar-file",
     "description": "Provides support for ActiveRecord file attachment",
-    "keywords": ["yii2", "active", "record", "file", "attachment", "image", "thumbnail"],
+    "keywords": ["yii2", "active", "record", "file", "attachment", "transformation", "image", "thumbnail"],
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
