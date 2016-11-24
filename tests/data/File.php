@@ -6,7 +6,7 @@ use yii\db\ActiveRecord;
 use yii2tech\ar\file\FileBehavior;
 
 /**
- * @property integer $id
+ * @property int $id
  * @property string $name
  * @property string $fileExtension
  * @property string $fileVersion

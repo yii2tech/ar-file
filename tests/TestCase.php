@@ -140,8 +140,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
      * @param \yii\db\BaseActiveRecord|\yii2tech\ar\file\FileBehavior $model model instance.
      * @param string $fileName file self name.
      * @param string $fileContent file content.
-     * @param integer|boolean $tabularIndex file input tabular index, if false - ni index will be used.
-     * @return boolean success.
+     * @param int|bool $tabularIndex file input tabular index, if `false` - no index will be used.
+     * @return bool success.
      */
     protected function mockUpUploadedFile($model, $fileName, $fileContent, $tabularIndex = false)
     {
@@ -187,7 +187,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * Deletes the file inside test directory.
      * @param string $fileSelfName file self name.
-     * @return boolean success.
+     * @return bool success.
      */
     protected function deleteTestFile($fileSelfName)
     {

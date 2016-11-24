@@ -66,7 +66,7 @@ class ImageFileBehavior extends TransformFileBehavior
      * @param array $transformSettings is the transform settings data, it should be the pair: 'imageWidth' and 'imageHeight',
      * For example: `[800, 600]`
      * @throws InvalidConfigException on invalid transform settings.
-     * @return boolean success.
+     * @return bool success.
      */
     protected function transformImageFileResize($sourceFileName, $destinationFileName, $transformSettings)
     {

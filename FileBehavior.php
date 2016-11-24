@@ -89,7 +89,7 @@ class FileBehavior extends Behavior
      */
     public $fileVersionAttribute = 'fileVersion';
     /**
-     * @var integer index of the HTML input file field in case of tabular input (input name has format "ModelName[$i][file]").
+     * @var int index of the HTML input file field in case of tabular input (input name has format "ModelName[$i][file]").
      * Note: after owner is saved this property will be reset.
      */
     public $fileTabularInputIndex;
@@ -99,7 +99,7 @@ class FileBehavior extends Behavior
      */
     public $defaultFileUrl;
     /**
-     * @var boolean indicates if behavior will attempt to fetch uploaded file automatically from the HTTP request.
+     * @var bool indicates if behavior will attempt to fetch uploaded file automatically from the HTTP request.
      */
     public $autoFetchUploadedFile = true;
 
@@ -256,7 +256,7 @@ class FileBehavior extends Behavior
 
     /**
      * Returns current version value of the model's file.
-     * @return integer current version of model's file.
+     * @return int current version of model's file.
      */
     public function getCurrentFileVersion()
     {
@@ -266,7 +266,7 @@ class FileBehavior extends Behavior
 
     /**
      * Returns next version value of the model's file.
-     * @return integer next version of model's file.
+     * @return int next version of model's file.
      */
     public function getNextFileVersion()
     {
@@ -275,7 +275,7 @@ class FileBehavior extends Behavior
 
     /**
      * Creates file itself name (without path) including version and extension.
-     * @param integer $fileVersion file version number.
+     * @param int $fileVersion file version number.
      * @param string $fileExtension file extension.
      * @return string file self name.
      */
@@ -294,7 +294,7 @@ class FileBehavior extends Behavior
     /**
      * Creates the file name in the file storage.
      * This name contains the sub directory, resolved by [[subDirTemplate]].
-     * @param integer $fileVersion file version number.
+     * @param int $fileVersion file version number.
      * @param string $fileExtension file extension.
      * @return string file full name.
      */
@@ -315,9 +315,9 @@ class FileBehavior extends Behavior
      * This method will determine new file version and extension, and will update the owner
      * model correspondingly.
      * @param string|UploadedFile $sourceFileNameOrUploadedFile file system path to source file or [[UploadedFile]] instance.
-     * @param boolean $deleteSourceFile determines would the source file be deleted in the process or not,
+     * @param bool $deleteSourceFile determines would the source file be deleted in the process or not,
      * if null given file will be deleted if it was uploaded via POST.
-     * @return boolean save success.
+     * @return bool save success.
      */
     public function saveFile($sourceFileNameOrUploadedFile, $deleteSourceFile = null)
     {
@@ -359,9 +359,9 @@ class FileBehavior extends Behavior
      * Creates the file for the model from the source file.
      * File version and extension are passed to this method.
      * @param string $sourceFileName - source full file name.
-     * @param integer $fileVersion - file version number.
+     * @param int $fileVersion - file version number.
      * @param string $fileExtension - file extension.
-     * @return boolean success.
+     * @return bool success.
      */
     protected function newFile($sourceFileName, $fileVersion, $fileExtension)
     {
@@ -372,7 +372,7 @@ class FileBehavior extends Behavior
 
     /**
      * Removes file associated with the owner model.
-     * @return boolean success.
+     * @return bool success.
      */
     public function deleteFile()
     {
@@ -432,7 +432,7 @@ class FileBehavior extends Behavior
 
     /**
      * Checks if file related to the model exists.
-     * @return boolean file exists.
+     * @return bool file exists.
      */
     public function fileExists()
     {

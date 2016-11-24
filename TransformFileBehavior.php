@@ -56,11 +56,11 @@ class TransformFileBehavior extends FileBehavior
      *
      * ```php
      * function(string $sourceFileName, string $destinationFileName, mixed $transformationSettings) {
-     *     //return boolean;
+     *     //return bool;
      * }
      * ```
      *
-     * Callback should return boolean, which indicates whether transformation was successful or not.
+     * Callback should return bool, which indicates whether transformation was successful or not.
      */
     public $transformCallback;
     /**
@@ -183,7 +183,7 @@ class TransformFileBehavior extends FileBehavior
      * Creates file itself name (without path) including version and extension.
      * This method overrides parent implementation in order to include transformation name.
      * @param string $fileTransformName image transformation name.
-     * @param integer $fileVersion file version number.
+     * @param int $fileVersion file version number.
      * @param string $fileExtension file extension.
      * @return string file self name.
      */
@@ -235,7 +235,7 @@ class TransformFileBehavior extends FileBehavior
      * Creates the file name in the file storage.
      * This name contains the sub directory, resolved by [[subDirTemplate]].
      * @param string $fileTransformName file transformation name.
-     * @param integer $fileVersion file version number.
+     * @param int $fileVersion file version number.
      * @param string $fileExtension file extension.
      * @return string file full name.
      */
@@ -284,9 +284,9 @@ class TransformFileBehavior extends FileBehavior
      * Parent method is overridden in order to save several different files
      * per one particular model.
      * @param string $sourceFileName - source full file name.
-     * @param integer $fileVersion - file version number.
+     * @param int $fileVersion - file version number.
      * @param string $fileExtension - file extension.
-     * @return boolean success.
+     * @return bool success.
      */
     protected function newFile($sourceFileName, $fileVersion, $fileExtension)
     {
@@ -348,7 +348,7 @@ class TransformFileBehavior extends FileBehavior
     /**
      * Overridden.
      * Removes all files associated with the owner model.
-     * @return boolean success.
+     * @return bool success.
      */
     public function deleteFile()
     {
@@ -373,7 +373,7 @@ class TransformFileBehavior extends FileBehavior
      * @param string $sourceFileName is the full source file system name.
      * @param string $destinationFileName is the full destination file system name.
      * @param mixed $transformationSettings is the transform settings data, its value is retrieved from [[fileTransformations]]
-     * @return boolean success.
+     * @return bool success.
      */
     protected function transformFile($sourceFileName, $destinationFileName, $transformationSettings)
     {
@@ -387,7 +387,7 @@ class TransformFileBehavior extends FileBehavior
      * Note that this method will increment the file version.
      * @param string|null $sourceTransformationName name of the file transformation, which should be used as source file,
      * if not set - default transformation will be used.
-     * @return boolean success.
+     * @return bool success.
      * @since 1.0.2
      */
     public function regenerateFileTransformations($sourceTransformationName = null)
@@ -405,7 +405,7 @@ class TransformFileBehavior extends FileBehavior
     /**
      * Checks if file related to the model exists.
      * @param string $name transformation name
-     * @return boolean file exists.
+     * @return bool file exists.
      */
     public function fileExists($name = null)
     {
