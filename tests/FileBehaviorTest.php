@@ -91,6 +91,15 @@ class FileBehaviorTest extends TestCase
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('{' . $testPropertyName . '}', $model->$testPropertyName, $testSubDirTemplate);
         $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse property!');
+
+        $model->id = 54321;
+        $closure = function($model){
+            return 'test/' . md5($model->id) . '/subdir/template';
+        };
+        $model->subDirTemplate = $closure;
+        $actualSubDir = $model->getActualSubDir();
+        $expectedActualSubDir = $closure($model);
+        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse callable!');
     }
 
     /**

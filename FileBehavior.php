@@ -31,7 +31,7 @@ use yii2tech\filestorage\StorageInterface;
  *
  * Attention: this extension requires the extension "yii2tech/file-storage" to be attached to the application!
  * Files will be saved using file storage component.
- * 
+ *
  * @see StorageInterface
  * @see BucketInterface
  *
@@ -60,15 +60,24 @@ class FileBehavior extends Behavior
      */
     public $fileStorageBucket;
     /**
-     * @var string template of all sub directories, which will store a particular
+     * @var string|callable template of all sub directories, which will store a particular
      * model instance's files. Value of this parameter will be parsed per each model instance.
      * You can use model attribute names to create sub directories, for example place all transformed
      * files in the subfolder with the name of model id. To use a dynamic value of attribute
      * place attribute name in curly brackets, for example: {id}.
+     * Template can be set as a callback function returning string template:
+     *
+     * ```php
+     * function ($model, $fileAttribute) {
+     *     // return the actual path or mix it with placeholders
+     * }
+     * ```
+     *
      * You may also specify special placeholders:
      *
      * - {pk} - resolved as primary key value of the owner model,
-     * - {__model__} - resolved as class base name of the owner model,
+     * - {__model__} - resolved as class name of the owner model,
+     * - {__shortname__} - resolved as class short name of the owner model,
      * - {__file__} - resolved as value of [[fileAttribute]].
      *
      * You may place symbols "^" before any placeholder name, such placeholder will be resolved as single
@@ -171,7 +180,11 @@ class FileBehavior extends Behavior
      */
     public function getActualSubDir()
     {
-        $subDirTemplate = $this->subDirTemplate;
+        if (is_callable($this->subDirTemplate)) {
+            $subDirTemplate = call_user_func($this->subDirTemplate, $this->owner, $this->fileAttribute);
+        } else {
+            $subDirTemplate = $this->subDirTemplate;
+        }
         if (empty($subDirTemplate)) {
             return $subDirTemplate;
         }
@@ -200,6 +213,11 @@ class FileBehavior extends Behavior
             case '__model__': {
                 $owner = $this->owner;
                 $placeholderValue = str_replace('\\', '_', get_class($owner));
+                break;
+            }
+            case '__shortname__': {
+                $owner = $this->owner;
+                $placeholderValue = Inflector::camel2id(StringHelper::basename(get_class($this->owner)), '_');
                 break;
             }
             case '__file__': {
