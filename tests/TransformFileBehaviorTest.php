@@ -93,7 +93,7 @@ class TransformFileBehaviorTest extends TestCase
 
         $testFileName = $this->getTestFileFullName();
 
-        $this->setExpectedException('yii\base\InvalidConfigException');
+        $this->expectException('yii\base\InvalidConfigException');
         $model->saveFile($testFileName);
     }
 

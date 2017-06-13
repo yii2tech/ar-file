@@ -78,8 +78,6 @@ class FileBehavior extends Behavior
      *
      * - {pk} - resolved as primary key value of the owner model,
      * - {__model__} - resolved as class name of the owner model, replacing namespace separator (`\`) with underscore (`_`),
-     * - {__basemodel__} - resolved as class base name of the owner model, this placeholder is available since 1.0.3,
-     * - {__modelid__} - resolved as 'camel-to-id' inflection of the owner model class base name, this placeholder is available since 1.0.3,
      * - {__file__} - resolved as value of [[fileAttribute]].
      *
      * You may place symbols "^" before any placeholder name, such placeholder will be resolved as single
@@ -214,14 +212,6 @@ class FileBehavior extends Behavior
             }
             case '__model__': {
                 $placeholderValue = str_replace('\\', '_', get_class($this->owner));
-                break;
-            }
-            case '__basemodel__': {
-                $placeholderValue = StringHelper::basename(get_class($this->owner));
-                break;
-            }
-            case '__modelid__': {
-                $placeholderValue = Inflector::camel2id(StringHelper::basename(get_class($this->owner)), '_');
                 break;
             }
             case '__file__': {

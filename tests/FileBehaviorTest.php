@@ -107,14 +107,6 @@ class FileBehaviorTest extends TestCase
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('\\', '_', File::className());
         $this->assertEquals($expectedActualSubDir, $actualSubDir, '{__model__} placeholder parsed incorrectly!');
-
-        $model->subDirTemplate = '{__basemodel__}';
-        $actualSubDir = $model->getActualSubDir();
-        $this->assertEquals('File', $actualSubDir, '{__basemodel__} placeholder parsed incorrectly!');
-
-        $model->subDirTemplate = '{__modelid__}';
-        $actualSubDir = $model->getActualSubDir();
-        $this->assertEquals('file', $actualSubDir, '{__modelid__} placeholder parsed incorrectly!');
     }
 
     /**
