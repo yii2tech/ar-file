@@ -5,6 +5,7 @@ Yii 2 ActiveRecord File Attachment extension Change Log
 -----------------------
 
 - Enh #6: Added `FileBehavior::openFile()` method as a shortcut to `yii2tech\filestorage\BucketInterface::openFile()` (klimov-paul)
+- Enh #9: `FileBehavior::$subDirTemplate` now accepts the PHP callback and supports additional placeholders `{__basemodel__}` and `{__modelid__}` (nexen2, klimov-paul)
 
 
 1.0.2, October 7, 2016

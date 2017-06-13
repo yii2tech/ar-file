@@ -65,41 +65,56 @@ class FileBehaviorTest extends TestCase
 
         $model = File::findOne(1);
 
+        $model->subDirTemplate = null;
+        $actualSubDir = $model->getActualSubDir();
+        $this->assertEquals('', $actualSubDir, 'Actual sub dir can not parse primary key!');
+
         $testSubDirTemplate = 'test/{pk}/subdir/template';
         $model->subDirTemplate = $testSubDirTemplate;
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('{pk}', $model->getPrimaryKey(), $testSubDirTemplate);
-        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse primary key!');
+        $this->assertEquals($expectedActualSubDir, $actualSubDir, 'Actual sub dir can not parse primary key!');
 
         $model->id = 54321;
         $testSubDirTemplate = 'test/{^pk}/subdir/template';
         $model->subDirTemplate = $testSubDirTemplate;
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('{^pk}', substr($model->getPrimaryKey(),0,1), $testSubDirTemplate);
-        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse primary key first symbol!');
+        $this->assertEquals($expectedActualSubDir, $actualSubDir, 'Actual sub dir can not parse primary key first symbol!');
 
         $model->id = 54321;
         $testSubDirTemplate = 'test/{^^pk}/subdir/template';
         $model->subDirTemplate = $testSubDirTemplate;
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('{^^pk}', substr($model->getPrimaryKey(),1,1), $testSubDirTemplate);
-        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse primary key second symbol!');
+        $this->assertEquals($expectedActualSubDir, $actualSubDir, 'Actual sub dir can not parse primary key second symbol!');
 
         $testPropertyName = 'name';
         $testSubDirTemplate = 'test/{' . $testPropertyName . '}/subdir/template';
         $model->subDirTemplate = $testSubDirTemplate;
         $actualSubDir = $model->getActualSubDir();
         $expectedActualSubDir = str_replace('{' . $testPropertyName . '}', $model->$testPropertyName, $testSubDirTemplate);
-        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse property!');
+        $this->assertEquals($expectedActualSubDir, $actualSubDir, 'Actual sub dir can not parse property!');
 
-        $model->id = 54321;
-        $closure = function($model){
-            return 'test/' . md5($model->id) . '/subdir/template';
+        $model->id = 17;
+        $model->subDirTemplate = function ($model) {
+            return 'test/closure/' . $model->id;
         };
-        $model->subDirTemplate = $closure;
         $actualSubDir = $model->getActualSubDir();
-        $expectedActualSubDir = $closure($model);
-        $this->assertEquals($actualSubDir, $expectedActualSubDir, 'Actual sub dir can not parse callable!');
+        $this->assertEquals('test/closure/17', $actualSubDir, 'Actual sub dir can not parse callable!');
+
+        $model->subDirTemplate = '{__model__}';
+        $actualSubDir = $model->getActualSubDir();
+        $expectedActualSubDir = str_replace('\\', '_', File::className());
+        $this->assertEquals($expectedActualSubDir, $actualSubDir, '{__model__} placeholder parsed incorrectly!');
+
+        $model->subDirTemplate = '{__basemodel__}';
+        $actualSubDir = $model->getActualSubDir();
+        $this->assertEquals('File', $actualSubDir, '{__basemodel__} placeholder parsed incorrectly!');
+
+        $model->subDirTemplate = '{__modelid__}';
+        $actualSubDir = $model->getActualSubDir();
+        $this->assertEquals('file', $actualSubDir, '{__modelid__} placeholder parsed incorrectly!');
     }
 
     /**

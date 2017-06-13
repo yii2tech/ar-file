@@ -65,19 +65,21 @@ class FileBehavior extends Behavior
      * You can use model attribute names to create sub directories, for example place all transformed
      * files in the subfolder with the name of model id. To use a dynamic value of attribute
      * place attribute name in curly brackets, for example: {id}.
-     * Template can be set as a callback function returning string template:
+     *
+     * Since 1.0.3 template can be set as a callback returning actual string template:
      *
      * ```php
-     * function ($model, $fileAttribute) {
-     *     // return the actual path or mix it with placeholders
+     * function (BaseActiveRecord $model) {
+     *     // return string, the actual path or mix it with placeholders
      * }
      * ```
      *
      * You may also specify special placeholders:
      *
      * - {pk} - resolved as primary key value of the owner model,
-     * - {__model__} - resolved as class name of the owner model,
-     * - {__shortname__} - resolved as class short name of the owner model,
+     * - {__model__} - resolved as class name of the owner model, replacing namespace separator (`\`) with underscore (`_`),
+     * - {__basemodel__} - resolved as class base name of the owner model, this placeholder is available since 1.0.3,
+     * - {__modelid__} - resolved as 'camel-to-id' inflection of the owner model class base name, this placeholder is available since 1.0.3,
      * - {__file__} - resolved as value of [[fileAttribute]].
      *
      * You may place symbols "^" before any placeholder name, such placeholder will be resolved as single
@@ -180,8 +182,8 @@ class FileBehavior extends Behavior
      */
     public function getActualSubDir()
     {
-        if (is_callable($this->subDirTemplate)) {
-            $subDirTemplate = call_user_func($this->subDirTemplate, $this->owner, $this->fileAttribute);
+        if (!is_scalar($this->subDirTemplate) && is_callable($this->subDirTemplate)) {
+            $subDirTemplate = call_user_func($this->subDirTemplate, $this->owner);
         } else {
             $subDirTemplate = $this->subDirTemplate;
         }
@@ -211,12 +213,14 @@ class FileBehavior extends Behavior
                 break;
             }
             case '__model__': {
-                $owner = $this->owner;
-                $placeholderValue = str_replace('\\', '_', get_class($owner));
+                $placeholderValue = str_replace('\\', '_', get_class($this->owner));
                 break;
             }
-            case '__shortname__': {
-                $owner = $this->owner;
+            case '__basemodel__': {
+                $placeholderValue = StringHelper::basename(get_class($this->owner));
+                break;
+            }
+            case '__modelid__': {
                 $placeholderValue = Inflector::camel2id(StringHelper::basename(get_class($this->owner)), '_');
                 break;
             }
@@ -225,9 +229,8 @@ class FileBehavior extends Behavior
                 break;
             }
             default: {
-                $owner = $this->owner;
                 try {
-                    $placeholderValue = $owner->$placeholderName;
+                    $placeholderValue = $this->owner->{$placeholderName};
                 } catch (UnknownPropertyException $exception) {
                     $placeholderValue = $placeholderName;
                 }
