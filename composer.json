@@ -20,6 +20,12 @@
         "yiisoft/yii2": "*",
         "yii2tech/file-storage": "*"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
     "suggest": {
         "yiisoft/yii2-imagine": "required for `ImageFileBehavior`"
     },
